@@ -1,11 +1,12 @@
 # SPICE Station AI
 
-AI-native waveform viewer for ngspice and LTspice — fast, interactive, and keyboard-friendly.
+SPICE Station AI is an AI-native waveform viewer for ngspice and LTspice built for a fast, fluid analysis workflow. Open one or more `.raw` files and immediately get a clean, interactive plot: zoom and pan with the mouse, style traces, place dual cursors, and read off precise values with engineering-prefix formatting.
 
-Open one or more `.raw` files and immediately get a clean, interactive plot. Zoom and pan with the mouse, style traces, place dual cursors, and read off precise values with engineering-prefix formatting. Parametric sweep files are handled natively, with all sweep steps grouped and labelled for easy comparison. Derive new traces on the fly with the math expression bar — gain in dB, phase, differential signals, FFTs — directly from simulation data.
+Parametric sweep files are handled natively: all sweep steps appear grouped under a single file header, with labels in the legend for easy comparison. The math expression bar lets you derive new traces on the fly — gain in dB, phase, differential signals, FFTs — directly from the simulation data. The signal browser has a live filter box: type a substring to narrow the list, then use **Plot visible** to plot only the matching signals in one click.
 
-A built-in AI assistant lets you control the view in plain English:
-*"plot v(out) and v(in) on separate plots"* · *"show the gain in dB"* · *"move cursor A to the –3 dB point"*
+Sessions and scripts make your analysis reproducible. Save the full workspace to a `.sssession` file, or export a `.ssscript` command log and replay it headlessly to regenerate PNG or CSV outputs automatically. 
+
+A built-in AI chat assistant lets you control the view in plain English — *"plot v(out) and v(in)"*, *"plot the gain in dB and color it red"*, *"add cursor A at 10n"* — with support for local (Ollama), Claude Code, and cloud (Groq, Anthropic, Gemini) providers.
 
 ---
 
@@ -93,39 +94,55 @@ fft(V(out))
 
 ## AI assistant
 
-Open **Edit → Settings…** to choose a provider. No restart needed.
+Open **Edit → Settings…** to choose a provider. Changes take effect immediately without restarting.
 
-| Provider | Cost | GPU | Notes |
-|---|---|---|---|
-| **Ollama** | Free | Optional | Local inference, no internet, recommended |
-| **Groq** | Free tier | No | Cloud, fast, requires API key |
-| **Google Gemini** | Free tier | No | Cloud, requires API key |
-| **Anthropic** | Paid | No | Cloud, requires API key |
-| **Claude Code** | Subscription | No | Requires Claude Max/Pro |
+Config file: `~/.config/spice-station-ai/config.toml`
 
-### Ollama (quickstart)
+### Ollama (recommended — local, no API key, no internet)
 
-```bash
-# Install from ollama.com, then:
-ollama pull granite4.1:3b
-ollama serve
-```
-Launch the app — Ollama is selected by default, no config file needed.
+1. Install Ollama from [ollama.com](https://ollama.com)
+2. Pull a model:
+   ```bash
+   ollama pull granite4.1:3b   # default, best tool-calling at ~2 GB VRAM
+   ```
+3. Start the server:
+   ```bash
+   ollama serve
+   ```
+4. Launch the app — Ollama is the default provider, no config needed.
 
-### Groq
+### Groq (cloud, free limited tier, no GPU)
 
-```bash
-export GROQ_API_KEY=gsk_...   # Linux
-```
-```toml
-# ~/.config/spice-station-ai/config.toml
-[ai]
-provider = "groq"
-model = "llama-3.3-70b-versatile"
+1. Get a free key at [console.groq.com](https://console.groq.com)
+2. Set the environment variable (add to `~/.bashrc` or `~/.zshrc` to persist):
+   ```bash
+   export GROQ_API_KEY=gsk_...
+   ```
+3. Create `~/.config/spice-station-ai/config.toml`:
+   ```toml
+   [ai]
+   provider = "groq"
+   model = "qwen/qwen3-32b"
 
-[ai.groq]
-api_key_env = "GROQ_API_KEY"
-```
+   [ai.groq]
+   api_key_env = "GROQ_API_KEY"
+   ```
+
+### Claude Code (requires Claude Max or Pro subscription)
+
+1. Install Node.js, then:
+   ```bash
+   npm install -g @anthropic-ai/claude-code
+   claude auth login
+   ```
+2. Create `~/.config/spice-station-ai/config.toml`:
+   ```toml
+   [ai]
+   provider = "claude_code"
+
+   [ai.claude_code]
+   executable = "claude"
+   ```
 
 ### Example prompts
 
@@ -136,7 +153,7 @@ Add a dB gain trace: db(v(out)/v(in)).
 Set the X axis to log scale.
 Place cursor A at 1000 Hz.
 Make the v(out) trace red.
-Give each trace its own plot.
+Split traces.
 Export all plots as PNG.
 ```
 

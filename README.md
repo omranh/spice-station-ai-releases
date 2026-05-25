@@ -25,6 +25,17 @@ No Python installation required. Each archive is fully self-contained.
 
 ---
 
+## System requirements
+
+| Platform | Minimum OS | Notes |
+|---|---|---|
+| **Linux** x86-64 | GLIBC 2.34 | Ubuntu 22.04+, Debian 12+, RHEL/AlmaLinux 9+, Fedora 35+ |
+| **Windows** x86-64 | Windows 10 | x86-64 only; ARM not supported |
+
+> **Linux note:** GLIBC 2.34 is the minimum imposed by Qt 6 / PySide6. Older distributions (Ubuntu 20.04, Debian 11, CentOS 7/8) are not supported. Run `ldd --version` in a terminal to check your GLIBC version.
+
+---
+
 ## Install
 
 ### Linux
